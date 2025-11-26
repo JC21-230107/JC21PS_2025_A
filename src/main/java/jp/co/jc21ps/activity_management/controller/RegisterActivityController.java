@@ -111,16 +111,16 @@ public class RegisterActivityController {
                     Locale.getDefault());
 
             // 活動登録に成功した場合、トップ画面に遷移
-            if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
-                redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
-                // mav.addObject("leaderClubId", leaderClubId);
-                mav.setViewName("redirect:/top");
-                return mav;
+//             if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
+//                 redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
+//                 mav.addObject("leaderClubId", leaderClubId);
+//                 mav.setViewName("redirect:/top");
+//                 return mav;
 
-            } else {
-                // 活動登録に失敗した場合、エラー画面に遷移
-                mav.setViewName("error");
-            }
+//             } else {
+//                 // 活動登録に失敗した場合、エラー画面に遷移
+//                 mav.setViewName("error");
+//             }
 
         } catch (Exception e) {
             // DB接続に失敗した場合、エラー画面に遷移
