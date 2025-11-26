@@ -49,10 +49,10 @@ public class ParticipantListController {
          */
 
         // セッションが切れた場合、エラー画面に遷移
-        if (userId.isEmpty()) {
-            mav.setViewName("error");
-            return mav;
-        }
+//         if (userId.isEmpty()) {
+//             mav.setViewName("error");
+//             return mav;
+//         }
 
         /*
          * ➋TODO dtoに値をセット
@@ -75,7 +75,7 @@ public class ParticipantListController {
             // messages.propertiesからメッセージを取得
             String resultMessage = messageSource.getMessage("notpariticipant", null, Locale.getDefault());
             mav.addObject("message", resultMessage);
-            mav.addObject("leaderClubId", leaderClubId);
+//             mav.addObject("leaderClubId", leaderClubId);
 
             // 遷移先の設定
             mav.setViewName("participantList");
