@@ -121,7 +121,7 @@ public class RegisterActivityController {
 //                 // 活動登録に失敗した場合、エラー画面に遷移
 //                 mav.setViewName("error");
 //             }
-
+          
         } catch (Exception e) {
             // DB接続に失敗した場合、エラー画面に遷移
             mav.setViewName("error");
