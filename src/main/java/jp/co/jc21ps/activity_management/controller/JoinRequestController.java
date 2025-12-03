@@ -48,7 +48,7 @@ public class JoinRequestController {
         String leaderClubId = sessionDto.getClubId();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (userId.isEmpty()) {
+        if (userId == null || userId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
@@ -79,9 +79,24 @@ public class JoinRequestController {
         // リダイレクトされてきた登録申請成功のメッセージを、paramFormにセットする
         paramForm.setMessage(joinOkMessage);
 
-        /*
-         * TODO ➊ 初期表示情報取得結果に応じて、以下の条件文を完成させる。
-         */
+        // 初期表示情報取得結果に応じて、条件分岐処理
+        if (responseForm.isEmpty()) {
+            // データが存在しない場合：notRequestClubMessageを取得してModelAndViewに追加
+            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null,
+                    Locale.getDefault());
+            mav.addObject("notRequestClubMessage", notRequestClubMessage);
+            // formから取得したメッセージをModelAndViewに追加
+            if (paramForm.getMessage() != null && !paramForm.getMessage().isEmpty()) {
+                mav.addObject("joinRequestCompleteMessage", paramForm.getMessage());
+            }
+        } else {
+            // データが存在する場合：clubListをModelAndViewに追加
+            mav.addObject("clubList", responseForm);
+            // formから取得したメッセージをModelAndViewに追加
+            if (paramForm.getMessage() != null && !paramForm.getMessage().isEmpty()) {
+                mav.addObject("joinRequestCompleteMessage", paramForm.getMessage());
+            }
+        }
 
         mav.addObject("leaderClubId", leaderClubId);
 
@@ -103,7 +118,7 @@ public class JoinRequestController {
         String userId = sessionDto.getUserId();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (userId.isEmpty()) {
+        if (userId == null || userId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
@@ -115,11 +130,21 @@ public class JoinRequestController {
 
         try {
             boolean result = joinRequestService.insertJoinRequest(joinRequestSaveDto);
-            /*
-             * TODO ➋ インサートの成功、失敗に応じて、処理を変更する。
-             */
+            // インサートの成功、失敗に応じて、処理を変更する
+            if (result) {
+                // 登録成功時：joinRequestCompleteMessageを取得してformにセットし、/joinRequestにリダイレクト
+                String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null,
+                        Locale.getDefault());
+                redirectAttributes.addFlashAttribute("joinOkMessage", joinRequestCompleteMessage);
+                mav.setViewName("redirect:/joinRequest");
+                return mav;
+            } else {
+                // 登録失敗時：エラー画面に遷移
+                mav.setViewName("error");
+            }
 
         } catch (Exception e) {
+            // DB接続に失敗した場合、エラー画面に遷移
             mav.setViewName("error");
         }
         return mav;
