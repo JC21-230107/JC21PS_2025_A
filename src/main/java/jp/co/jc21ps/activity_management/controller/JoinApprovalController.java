@@ -6,8 +6,10 @@ import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jp.co.jc21ps.activity_management.dto.JoinApprovalDataDto;
 import jp.co.jc21ps.activity_management.dto.JoinApprovalDto;
@@ -36,7 +38,8 @@ public class JoinApprovalController {
     }
 
     @GetMapping
-    public ModelAndView getjoinApproval(HttpSession session) {
+    public ModelAndView getjoinApproval(HttpSession session,
+            @ModelAttribute("message") String flashMessage) {
 
         ModelAndView mav = new ModelAndView();
 
@@ -82,11 +85,16 @@ public class JoinApprovalController {
 
             mav.addObject("clubName", viewList.getClubName());
 
-            // messages.propertiesからメッセージを取得
-            String resultMessage = messageSource.getMessage("notrequest", null, Locale.getDefault());
-
-            // 部員登録申請がない場合のメッセージ
-            mav.addObject("message", resultMessage);
+            // Flash属性からメッセージが渡された場合はそれを使用、なければデフォルトメッセージを取得
+            if (flashMessage != null && !flashMessage.isEmpty()) {
+                mav.addObject("message", flashMessage);
+            } else {
+                // messages.propertiesからメッセージを取得
+                String resultMessage = messageSource.getMessage("notrequest", null, Locale.getDefault());
+                // 部員登録申請がない場合のメッセージ
+                mav.addObject("message", resultMessage);
+            }
+            
             mav.addObject("joinApprovalform", responseForm);
             mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("JoinApproval");
@@ -100,7 +108,8 @@ public class JoinApprovalController {
 
     // 否認
     @PostMapping("/denial")
-    public ModelAndView denialRequest(JoinApprovalDataForm paramForm, HttpSession session) {
+    public ModelAndView denialRequest(JoinApprovalDataForm paramForm, HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
         // paramDtoに値をセット
         JoinApprovalDataDto paramDto = new JoinApprovalDataDto();
@@ -122,12 +131,14 @@ public class JoinApprovalController {
 
         try {
             // サービスからdeleteメソッドを呼び出す
-            /*
-             * TODO ➊ ユーザーを否認する際の処理を完成させる。
-             */
-
-            // deleteに成功した場合、部員登録承認画面に遷移
-            mav.addObject("leaderClubId", leaderClubId);
+            joinApprovalService.deleteRequestInfo(paramDto);
+            
+            // メッセージプロパティから否認メッセージを取得
+            String denialMessage = messageSource.getMessage("denialMessage", null, Locale.getDefault());
+            // Flash属性にメッセージを追加
+            redirectAttributes.addFlashAttribute("message", denialMessage);
+           
+            // deleteに成功した場合、部員登録承認画面にリダイレクト
             mav.setViewName("redirect:/joinApproval");
         } catch (Exception e) {
             // deleteに失敗した場合、エラー画面に遷移
@@ -141,7 +152,8 @@ public class JoinApprovalController {
 
     // 承認
     @PostMapping("/approval")
-    public ModelAndView approvalRequest(JoinApprovalDataForm paramForm, HttpSession session) {
+    public ModelAndView approvalRequest(JoinApprovalDataForm paramForm, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         // paramDtoに値をセット
         JoinApprovalDataDto paramDto = new JoinApprovalDataDto();
         paramDto.setUserId(paramForm.getUserId());
@@ -155,18 +167,24 @@ public class JoinApprovalController {
         ModelAndView mav = new ModelAndView();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (leaderClubId == null) {
+        if (leaderClubId == null || leaderClubId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
 
         try {
-            /*
-             * TODO ➋ ユーザーを承認する際の処理を完成させる。
-             */
+            // 1. 申請情報を削除
+            joinApprovalService.deleteRequestInfo(paramDto);
 
-            // insert, deleteに成功した場合、部員登録承認画面に遷移
-            mav.addObject("leaderClubId", leaderClubId);
+            // 2. クラブメンバーに登録
+            joinApprovalService.insertRequestInfo(paramDto);
+
+            // メッセージプロパティから承認メッセージを取得
+            String approvalMessage = messageSource.getMessage("approvalMessage", null, Locale.getDefault());
+            // Flash属性にメッセージを追加
+            redirectAttributes.addFlashAttribute("message", approvalMessage);
+
+            // insert, deleteに成功した場合、部員登録承認画面にリダイレクト
             mav.setViewName("redirect:/joinApproval");
 
         } catch (Exception e) {
