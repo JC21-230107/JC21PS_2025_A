@@ -85,9 +85,12 @@ public class ClubInfoRegisterController {
         String leaderClubId = sessionDto.getClubId();
 
         // バリデーション
-        /*
-         * TODO ➊ バリデーションエラーの際の処理を完成させる。
-         */
+        if (bindingResult.hasErrors()) {
+            paramForm.setLeaderClubId(leaderClubId);
+            mav.addObject("clubInfoRegisterSaveForm", paramForm);
+            mav.setViewName("clubInfoRegister");
+            return mav;
+        }
 
         // セッションが切れた場合、エラー画面に遷移
         if (leaderClubId.isEmpty()) {
@@ -97,18 +100,24 @@ public class ClubInfoRegisterController {
 
         try {
             ClubInfoRegisterDto clubInfoRegisterDto = new ClubInfoRegisterDto();
-            /*
-             * TODO ➋ updateClubInfoメソッドの引数に使用しているclubInfoRegisterDtoに、パラメータを設定する。
-             */
+            clubInfoRegisterDto.setLeaderClubId(leaderClubId);
+            clubInfoRegisterDto.setClubDescription(paramForm.getClubDescription());
 
             String result = clubInfoRegisterService.updateClubInfo(clubInfoRegisterDto);
 
             // messages.propertiesからメッセージを取得
             String resultMessage = messageSource.getMessage(result, null, Locale.getDefault());
 
-            /*
-             * TODO ➌ resultの取得結果に応じて、遷移先を変更する。
-             */
+            if ("updateClubInfo".equals(result)) {
+                // 更新成功時
+                mav.addObject("message", resultMessage);
+                paramForm.setLeaderClubId(leaderClubId);
+                mav.addObject("clubInfoRegisterSaveForm", paramForm);
+                mav.setViewName("clubInfoRegister");
+            } else {
+                // 更新失敗時
+                mav.setViewName("error");
+            }
 
         } catch (Exception e) {
             // DB接続失敗した場合、エラー画面に遷移
