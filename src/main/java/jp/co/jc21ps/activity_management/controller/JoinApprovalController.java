@@ -122,10 +122,14 @@ public class JoinApprovalController {
 
         try {
             // サービスからdeleteメソッドを呼び出す
+            joinApprovalService.deleteRequestInfo(paramDto);
             /*
              * TODO ➊ ユーザーを否認する際の処理を完成させる。
              */
-
+            String denialMessage = messageSource.getMessage("denial.success", null, Locale.getDefault());
+            mav.addObject("message", denialMessage);
+            mav.addObject("form", paramForm);
+           
             // deleteに成功した場合、部員登録承認画面に遷移
             mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("redirect:/joinApproval");
@@ -164,6 +168,17 @@ public class JoinApprovalController {
             /*
              * TODO ➋ ユーザーを承認する際の処理を完成させる。
              */
+            // 1. 申請情報を削除
+            joinApprovalService.deleteRequestInfo(paramDto);
+
+            // 2. クラブメンバーに登録
+            joinApprovalService.insertRequestInfo(paramDto);
+
+            String approvalMessage = messageSource.getMessage("joinRequestCompleteMessage", null, Locale.getDefault());
+            mav.addObject("message", approvalMessage);
+            mav.addObject("form", paramForm);
+    
+
 
             // insert, deleteに成功した場合、部員登録承認画面に遷移
             mav.addObject("leaderClubId", leaderClubId);
