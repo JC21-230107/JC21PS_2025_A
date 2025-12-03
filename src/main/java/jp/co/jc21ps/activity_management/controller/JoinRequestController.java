@@ -82,8 +82,21 @@ public class JoinRequestController {
         /*
          * TODO ➊ 初期表示情報取得結果に応じて、以下の条件文を完成させる。
          */
+        
+        // 成功メッセージをオブジェクトに追加
+        if (joinOkMessage != null && !joinOkMessage.isEmpty()) {
+            mav.addObject("joinRequestCompleteMessage", joinOkMessage);
+        }
+        
+        // リストが空の場合、メッセージを表示
+        if (responseForm.isEmpty()) {
+            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null, Locale.getDefault());
+            mav.addObject("notRequestClubMessage", notRequestClubMessage);
+        } else {
+            // レスポンスをオブジェクトに追加（club_name, club_description, club_id）
+            mav.addObject("joinRequestSaveForm", responseForm);
+        }
 
-        mav.addObject("responseForm", responseForm);
         mav.addObject("leaderClubId", leaderClubId);
 
         // 部員登録申請画面に遷移
