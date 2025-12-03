@@ -82,6 +82,20 @@ public class JoinRequestController {
         /*
          * TODO ➊ 初期表示情報取得結果に応じて、以下の条件文を完成させる。
          */
+        
+        // 成功メッセージをオブジェクトに追加
+        if (joinOkMessage != null && !joinOkMessage.isEmpty()) {
+            mav.addObject("joinRequestCompleteMessage", joinOkMessage);
+        }
+        
+        // リストが空の場合、メッセージを表示
+        if (responseForm.isEmpty()) {
+            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null, Locale.getDefault());
+            mav.addObject("notRequestClubMessage", notRequestClubMessage);
+        } else {
+            // レスポンスをオブジェクトに追加（club_name, club_description, club_id）
+            mav.addObject("joinRequestSaveForm", responseForm);
+        }
 
         mav.addObject("leaderClubId", leaderClubId);
 
@@ -118,8 +132,19 @@ public class JoinRequestController {
             /*
              * TODO ➋ インサートの成功、失敗に応じて、処理を変更する。
              */
+            if (result) {
+                // 成功時：メッセージを取得してリダイレクト属性に追加
+                String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null, Locale.getDefault());
+                redirectAttributes.addFlashAttribute("joinOkMessage", joinRequestCompleteMessage);
+                // 部員登録申請画面へリダイレクト
+                mav.setViewName("redirect:/joinRequest");
+            } else {
+                // 失敗時：エラー画面に遷移
+                mav.setViewName("error");
+            }
 
         } catch (Exception e) {
+            // 例外発生時：エラー画面に遷移
             mav.setViewName("error");
         }
         return mav;

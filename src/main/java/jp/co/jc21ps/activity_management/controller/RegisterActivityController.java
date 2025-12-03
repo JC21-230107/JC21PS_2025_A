@@ -84,16 +84,16 @@ public class RegisterActivityController {
         // バリデーションエラー
         if (bindingResult.hasErrors()) {
             mav.addObject("registerActivitySaveForm", paramForm);
-//             mav.addObject("leaderClubId", leaderClubId);
+            // mav.addObject("leaderClubId", leaderClubId);
             mav.setViewName("registerActivity");
             return mav;
         }
 
         // セッションが切れた場合、エラー画面に遷移
-//         if (leaderClubId.isEmpty()) {
-//             mav.setViewName("error");
-//             return mav;
-//         }
+        // if (leaderClubId.isEmpty()) {
+        //     mav.setViewName("error");
+        //     return mav;
+        // }
 
         try {
             // インスタンス化
@@ -121,7 +121,7 @@ public class RegisterActivityController {
 //                 // 活動登録に失敗した場合、エラー画面に遷移
 //                 mav.setViewName("error");
 //             }
-
+          
         } catch (Exception e) {
             // DB接続に失敗した場合、エラー画面に遷移
             mav.setViewName("error");
