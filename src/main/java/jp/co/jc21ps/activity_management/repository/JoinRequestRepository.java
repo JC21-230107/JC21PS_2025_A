@@ -21,6 +21,7 @@ public class JoinRequestRepository {
         // 初期表示情報を取得するSQL
         // mst_clubから、trn_join_requestとtrn_club_memberに存在しないclubを取得
         String sql = """
+<<<<<<< HEAD
                 SELECT 
                     c.club_id,
                     c.club_name,
@@ -43,6 +44,23 @@ public class JoinRequestRepository {
                     )
                 ORDER BY 
                     c.club_id
+=======
+                SELECT
+                    club.club_id,
+                    club.club_name,
+                    club.club_description
+                FROM
+                    mst_club as club
+                WHERE
+                    club.club_id NOT IN (
+                        SELECT club_id FROM trn_join_request WHERE user_id = ?
+                    )
+                    AND club.club_id NOT IN (
+                        SELECT club_id FROM trn_club_member WHERE user_id = ?
+                    )
+                ORDER BY
+                    club.club_id ASC
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
                 """;
 
         List<JoinRequestEntity> responseEntity = new ArrayList<>();
@@ -72,9 +90,18 @@ public class JoinRequestRepository {
     public void insertClub(JoinRequestSaveEntity paramEntity) {
         // 申請者の情報をインサートするSQL
         String sql = """
+<<<<<<< HEAD
                 INSERT INTO 
                     trn_join_request (user_id, club_id, leader_flg)
                 VALUES (?, ?, 0)
+=======
+                INSERT INTO
+                    trn_join_request
+                    (user_id,
+                    club_id)
+                VALUES
+                    (?, ?)
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
                 """;
 
         // entityから値をゲットする

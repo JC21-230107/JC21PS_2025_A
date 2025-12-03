@@ -76,26 +76,19 @@ public class JoinRequestController {
             responseForm.add(saveData);
 
         }
-        // リダイレクトされてきた登録申請成功のメッセージを、paramFormにセットする
-        paramForm.setMessage(joinOkMessage);
-
         // 初期表示情報取得結果に応じて、条件分岐処理
+        // 成功メッセージをオブジェクトに追加
+        if (joinOkMessage != null && !joinOkMessage.isEmpty()) {
+            mav.addObject("joinRequestCompleteMessage", joinOkMessage);
+        }
+        
+        // リストが空の場合、メッセージを表示
         if (responseForm.isEmpty()) {
-            // データが存在しない場合：notRequestClubMessageを取得してModelAndViewに追加
-            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null,
-                    Locale.getDefault());
+            String notRequestClubMessage = messageSource.getMessage("notRequestClubMessage", null, Locale.getDefault());
             mav.addObject("notRequestClubMessage", notRequestClubMessage);
-            // formから取得したメッセージをModelAndViewに追加
-            if (paramForm.getMessage() != null && !paramForm.getMessage().isEmpty()) {
-                mav.addObject("joinRequestCompleteMessage", paramForm.getMessage());
-            }
         } else {
-            // データが存在する場合：clubListをModelAndViewに追加
+            // レスポンスをオブジェクトに追加（club_name, club_description, club_id）
             mav.addObject("clubList", responseForm);
-            // formから取得したメッセージをModelAndViewに追加
-            if (paramForm.getMessage() != null && !paramForm.getMessage().isEmpty()) {
-                mav.addObject("joinRequestCompleteMessage", paramForm.getMessage());
-            }
         }
 
         mav.addObject("leaderClubId", leaderClubId);
@@ -132,19 +125,20 @@ public class JoinRequestController {
             boolean result = joinRequestService.insertJoinRequest(joinRequestSaveDto);
             // インサートの成功、失敗に応じて、処理を変更する
             if (result) {
-                // 登録成功時：joinRequestCompleteMessageを取得してformにセットし、/joinRequestにリダイレクト
-                String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null,
-                        Locale.getDefault());
+                // 成功時：メッセージを取得してリダイレクト属性に追加
+                String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null, Locale.getDefault());
                 redirectAttributes.addFlashAttribute("joinOkMessage", joinRequestCompleteMessage);
+                // 部員登録申請画面へリダイレクト
                 mav.setViewName("redirect:/joinRequest");
                 return mav;
             } else {
-                // 登録失敗時：エラー画面に遷移
+                // 失敗時：エラー画面に遷移
                 mav.setViewName("error");
             }
 
         } catch (Exception e) {
-            // DB接続に失敗した場合、エラー画面に遷移
+            // 例外発生時：エラー画面に遷移
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
             mav.setViewName("error");
         }
         return mav;
