@@ -22,7 +22,25 @@ public class JoinApprovalRepository {
          * TODO ➊ 初期表示情報を取得するSQLを完成させる。
          */
         String sql = """
-
+                SELECT
+                    request.club_id as club_Id,
+                    request.user_id,
+                    user.user_name,
+                    club.club_name
+                FROM
+                    trn_join_request as request
+                INNER JOIN
+                    mst_user as user
+                ON
+                    request.user_id = user.user_id
+                INNER JOIN
+                    mst_club as club
+                ON
+                    request.club_id = club.club_id
+                WHERE
+                    request.club_id = ?
+                ORDER BY
+                    request.user_id ASC
                 """;
 
         List<Map<String, Object>> joinApprovalList = jdbcTemplate.queryForList(sql, paramEntity.getClubId());
@@ -77,7 +95,13 @@ public class JoinApprovalRepository {
          * TODO ➋ ユーザーを承認するSQL文を完成させる。
          */
         String sqlInsert = """
-
+                INSERT INTO
+                    trn_club_member
+                    (club_id,
+                    user_id,
+                    leader_flg)
+                VALUES
+                    (?, ?, ?)
                 """;
 
         // entityから値をゲット
@@ -96,14 +120,18 @@ public class JoinApprovalRepository {
          * TODO ➌ ユーザーを否認するSQL文を完成させる。
          */
         String sqlDelete = """
-
+                DELETE FROM
+                    trn_join_request
+                WHERE
+                    club_id = ?
+                AND
+                    user_id = ?
                 """;
 
         // entityから値をゲット
         Object[] paramList = {
                 paramEntity.getClubId(),
-                paramEntity.getUserId(),
-                paramEntity.isLeaderFlg()
+                paramEntity.getUserId()
         };
 
         jdbcTemplate.update(sqlDelete, paramList);
