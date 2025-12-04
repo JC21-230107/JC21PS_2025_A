@@ -48,7 +48,7 @@ public class JoinRequestController {
         String leaderClubId = sessionDto.getClubId();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (userId.isEmpty()) {
+        if (userId == null || userId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
@@ -76,13 +76,7 @@ public class JoinRequestController {
             responseForm.add(saveData);
 
         }
-        // リダイレクトされてきた登録申請成功のメッセージを、paramFormにセットする
-        paramForm.setMessage(joinOkMessage);
-
-        /*
-         * TODO ➊ 初期表示情報取得結果に応じて、以下の条件文を完成させる。
-         */
-        
+        // 初期表示情報取得結果に応じて、条件分岐処理
         // 成功メッセージをオブジェクトに追加
         if (joinOkMessage != null && !joinOkMessage.isEmpty()) {
             mav.addObject("joinRequestCompleteMessage", joinOkMessage);
@@ -94,7 +88,7 @@ public class JoinRequestController {
             mav.addObject("notRequestClubMessage", notRequestClubMessage);
         } else {
             // レスポンスをオブジェクトに追加（club_name, club_description, club_id）
-            mav.addObject("joinRequestSaveForm", responseForm);
+            mav.addObject("clubList", responseForm);
         }
 
         mav.addObject("leaderClubId", leaderClubId);
@@ -117,7 +111,7 @@ public class JoinRequestController {
         String userId = sessionDto.getUserId();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (userId.isEmpty()) {
+        if (userId == null || userId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
@@ -129,15 +123,14 @@ public class JoinRequestController {
 
         try {
             boolean result = joinRequestService.insertJoinRequest(joinRequestSaveDto);
-            /*
-             * TODO ➋ インサートの成功、失敗に応じて、処理を変更する。
-             */
+            // インサートの成功、失敗に応じて、処理を変更する
             if (result) {
                 // 成功時：メッセージを取得してリダイレクト属性に追加
                 String joinRequestCompleteMessage = messageSource.getMessage("joinRequestCompleteMessage", null, Locale.getDefault());
                 redirectAttributes.addFlashAttribute("joinOkMessage", joinRequestCompleteMessage);
                 // 部員登録申請画面へリダイレクト
                 mav.setViewName("redirect:/joinRequest");
+                return mav;
             } else {
                 // 失敗時：エラー画面に遷移
                 mav.setViewName("error");
@@ -145,6 +138,7 @@ public class JoinRequestController {
 
         } catch (Exception e) {
             // 例外発生時：エラー画面に遷移
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
             mav.setViewName("error");
         }
         return mav;

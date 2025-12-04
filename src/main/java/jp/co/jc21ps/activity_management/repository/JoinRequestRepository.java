@@ -18,10 +18,33 @@ public class JoinRequestRepository {
 
     // 初期画面表示
     public List<JoinRequestEntity> getJoinRequestById(JoinRequestEntity paramEntity) {
-        /*
-         * TODO ➊ 初期表示情報を取得するSQLを完成させる。
-         */
+        // 初期表示情報を取得するSQL
+        // mst_clubから、trn_join_requestとtrn_club_memberに存在しないclubを取得
         String sql = """
+<<<<<<< HEAD
+                SELECT 
+                    c.club_id,
+                    c.club_name,
+                    c.club_description
+                FROM 
+                    mst_club c
+                WHERE 
+                    NOT EXISTS (
+                        SELECT 1 
+                        FROM trn_join_request jr 
+                        WHERE jr.user_id = ? 
+                        AND jr.club_id = c.club_id
+                    )
+                AND 
+                    NOT EXISTS (
+                        SELECT 1 
+                        FROM trn_club_member cm 
+                        WHERE cm.user_id = ? 
+                        AND cm.club_id = c.club_id
+                    )
+                ORDER BY 
+                    c.club_id
+=======
                 SELECT
                     club.club_id,
                     club.club_name,
@@ -37,6 +60,7 @@ public class JoinRequestRepository {
                     )
                 ORDER BY
                     club.club_id ASC
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
                 """;
 
         List<JoinRequestEntity> responseEntity = new ArrayList<>();
@@ -64,16 +88,20 @@ public class JoinRequestRepository {
 
     // 申請処理
     public void insertClub(JoinRequestSaveEntity paramEntity) {
-        /*
-         * TODO ➋ 申請者の情報をインサートするSQLを完成させる。
-         */
+        // 申請者の情報をインサートするSQL
         String sql = """
+<<<<<<< HEAD
+                INSERT INTO 
+                    trn_join_request (user_id, club_id, leader_flg)
+                VALUES (?, ?, 0)
+=======
                 INSERT INTO
                     trn_join_request
                     (user_id,
                     club_id)
                 VALUES
                     (?, ?)
+>>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
                 """;
 
         // entityから値をゲットする
