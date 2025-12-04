@@ -138,7 +138,6 @@ public class JoinRequestController {
 
         } catch (Exception e) {
             // 例外発生時：エラー画面に遷移
->>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
             mav.setViewName("error");
         }
         return mav;

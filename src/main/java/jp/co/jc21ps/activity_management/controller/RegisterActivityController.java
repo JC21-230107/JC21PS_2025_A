@@ -41,12 +41,13 @@ public class RegisterActivityController {
 
         ModelAndView mav = new ModelAndView();
 
-        // セッションからclubIdを取得
+        // セッションからuserId, clubIdを取得
         SessionDto sessionDto = commonService.getSessionDto(session);
+        String userId = sessionDto.getUserId();
         String leaderClubId = sessionDto.getClubId();
 
         // セッションが切れた場合、エラー画面に遷移
-        if (leaderClubId.isEmpty()) {
+        if (userId == null || userId.isEmpty() || leaderClubId == null || leaderClubId.isEmpty()) {
             mav.setViewName("error");
             return mav;
         }
@@ -118,7 +119,6 @@ public class RegisterActivityController {
                     Locale.getDefault());
 
             // 活動登録に成功した場合、トップ画面に遷移
-<<<<<<< HEAD
             if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
                 redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
                 mav.setViewName("redirect:/top");
@@ -128,19 +128,6 @@ public class RegisterActivityController {
                 mav.setViewName("error");
             }
 
-=======
-//             if ("activityRegisterCompleteMessage".equals(resultMessageKey)) {
-//                 redirectAttributes.addFlashAttribute("activityRegisterCompleteMessage", resultMessage);
-//                 mav.addObject("leaderClubId", leaderClubId);
-//                 mav.setViewName("redirect:/top");
-//                 return mav;
-
-//             } else {
-//                 // 活動登録に失敗した場合、エラー画面に遷移
-//                 mav.setViewName("error");
-//             }
-          
->>>>>>> cd18e4737bf8716ac2515203127aceee4d9ab0bf
         } catch (Exception e) {
             // DB接続に失敗した場合、エラー画面に遷移
             mav.setViewName("error");
